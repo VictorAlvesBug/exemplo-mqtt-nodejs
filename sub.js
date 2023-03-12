@@ -1,15 +1,30 @@
-const mqtt = require('mqtt');
-const urlBroker = 'mqtt://broker.mqttdashboard.com';
 
-const client = mqtt.connect(urlBroker, {
-    port: 1883,
+import mqtt from 'mqtt';
+import createOptionsFiller from './optionsFiller.js';
+
+let options = {
+  broker: 'mqtt://broker.mqttdashboard.com',
+  port: 1883,
+  username: null,
+  password: null,
+  topics: 'topico1;topico2;topico3',
+};
+
+options = await createOptionsFiller(options);
+
+const client = mqtt.connect(options.broker, {
+  port: options.port,
+  username: options.username,
+  password: options.password,
 });
 
 client.on('connect', function() {
-    client.subscribe('my-teste');
-    console.log('Inscrição do cliente realizada com sucesso');
+    options.topics.split(';').forEach(topic => {
+        client.subscribe(topic);
+        console.log(`Cliente inscrito no tópico: ${topic}`);
+    })
 });
 
 client.on('message', function(topic, message) {
-    console.log(`Mensagem recebida: "${message.toString()}"`);
+    console.log(`< "${topic}": ${message.toString()}`);
 });
