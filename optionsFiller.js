@@ -1,16 +1,13 @@
-import readline from 'readline';
-const rl = readline.createInterface(process.stdin, process.stdout);
-
-export default async function createOptionsFiller(options){
+export default async function createOptionsFiller(readline, options){
     for (let [chave, valor] of Object.entries(options)) {
         let retorno = await new Promise((resolve) => {
-            rl.question(`${chave}: `, resolve);
-            rl.write(valor?.toString());
+            readline.question(`${chave}: `, resolve);
+            readline.write(valor?.toString());
         });
         options[chave] = retorno || options[chave];
     }
     
-    rl.close();
+    readline.close();
 
     return options;
 }
